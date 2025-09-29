@@ -1,0 +1,31 @@
+{
+  "name": "facecheck-project",
+  "version": "1.0.0",
+  "description": "FaceAttend – Face Recognition Attendance System",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phanthang04/FaceCheck-Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phanthang04/FaceCheck-Project/issues"
+  },
+  "homepage": "https://github.com/phanthang04/FaceCheck-Project#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.14.4",
+    "sequelize": "^6.37.7"
+  },
+  "type": "module"
+}

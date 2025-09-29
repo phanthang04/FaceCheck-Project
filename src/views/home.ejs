@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Lớp Học</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+        }
+
+        .classes-section {
+            flex: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .add-class-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .add-class-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .class-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .class-info h3 {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .class-subject {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .class-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+            color: #667eea;
+        }
+
+        .attendance-rate {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .attendance-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .class-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .attendance-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .attendance-btn:hover {
+            background: #218838;
+        }
+
+        .students-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .students-btn:hover {
+            background: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f5;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .classes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Quản Lý Lớp Học</h1>
+            <div class="user-profile" onclick="showProfileModal()">
+                <div class="avatar">👨‍🏫</div>
+                <div>
+                    <div id = "teacherName" style="font-weight: 600;"></div>
+                    <div id = "teacherNameDisplay" style="font-size: 12px; opacity: 0.8;"></div>
+                </div>
+            </div>
+        </div>
+<script>
+    async function loadUserInfo() {
+        try {
+            const response = await fetch("api/account/getInfor", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include" // rất quan trọng để gửi cookie session lên BE
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                console.log(result)
+                document.getElementById('teacherNameDisplay').textContent = result.data.name;
+                document.getElementById('teacherName').value = result.data.name;
+                
+            } else {
+                console.log(result.message);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin user:", error);
+        }
+    }
+
+    // Gọi khi DOM load xong
+    document.addEventListener('DOMContentLoaded', function() {
+        renderClasses();
+        loadUserInfo();
+    });
+</script>
+
+        <div class="main-content">
+            <div class="classes-section">
+                <div class="section-header">
+                    <h2 class="section-title">Danh Sách Lớp Học</h2>
+                    <button class="add-class-btn" onclick="showAddClassModal()">
+                        <span style="font-size: 20px;">+</span>
+                        Thêm Lớp
+                    </button>
+                </div>
+                
+                <div class="classes-grid" id="classesGrid">
+                    <!-- Classes will be dynamically generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Thông Tin Cá Nhân</h2>
+                <button class="close-btn" onclick="hideProfileModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-item">
+                    <div class="info-icon">👤</div>
+                    <div>
+                        <div style="font-weight: 600;">Họ và tên</div>
+                        <input type="text" class="form-input" id="teacherName" value="Nguyễn Văn An">
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📧</div>
+                    <div>
+                        <div style="font-weight: 600;">Email</div>
+                        <input type="email" class="form-input" id="teacherEmail" value="nguyenvanan@school.edu.vn">
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📱</div>
+                    <div>
+                        <div style="font-weight: 600;">Số điện thoại</div>
+                        <input type="tel" class="form-input" id="teacherPhone" value="0123456789">
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📚</div>
+                    <div>
+                        <div style="font-weight: 600;">Bộ môn</div>
+                        <input type="text" class="form-input" id="teacherSubject" value="Toán - Lý">
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">⏱️</div>
+                    <div>
+                        <div style="font-weight: 600;">Kinh nghiệm</div>
+                        <input type="text" class="form-input" id="teacherExperience" value="15 năm">
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideProfileModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="updateProfile()">Cập Nhật</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Class Modal -->
+    <div class="modal" id="addClassModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Thêm Lớp Học Mới</h2>
+                <button class="close-btn" onclick="hideAddClassModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Tên lớp</label>
+                    <input type="text" class="form-input" id="className" placeholder="VD: Lớp 10A1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Môn học</label>
+                    <input type="text" class="form-input" id="classSubject" placeholder="VD: Toán">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Khối</label>
+                    <select class="form-input" id="classGrade">
+                        <option value="">Chọn khối</option>
+                        <option value="10">Khối 10</option>
+                        <option value="11">Khối 11</option>
+                        <option value="12">Khối 12</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phòng học</label>
+                    <input type="text" class="form-input" id="classRoom" placeholder="VD: A101">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sĩ số</label>
+                    <input type="number" class="form-input" id="totalStudents" placeholder="VD: 35" min="1" max="50">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="hideAddClassModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="addClass()">Thêm Lớp</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let classes = [
+            {
+                id: 1,
+                name: 'Lớp 10A1',
+                subject: 'Toán',
+                totalStudents: 35,
+                presentToday: 32,
+                grade: '10',
+                room: 'A101'
+            },
+            {
+                id: 2,
+                name: 'Lớp 11B2',
+                subject: 'Vật Lý',
+                totalStudents: 30,
+                presentToday: 28,
+                grade: '11',
+                room: 'B205'
+            },
+            {
+                id: 3,
+                name: 'Lớp 12C3',
+                subject: 'Hóa Học',
+                totalStudents: 28,
+                presentToday: 26,
+                grade: '12',
+                room: 'C304'
+            }
+        ];
+
+        // Functions
+        function renderClasses() {
+            const grid = document.getElementById('classesGrid');
+            grid.innerHTML = '';
+
+            classes.forEach(classItem => {
+                const attendanceRate = Math.round((classItem.presentToday / classItem.totalStudents) * 100);
+                const attendanceColor = attendanceRate >= 90 ? '#28a745' : attendanceRate >= 75 ? '#ffc107' : '#dc3545';
+
+                const classCard = document.createElement('div');
+                classCard.className = 'class-card';
+                classCard.innerHTML = `
+                    <div class="class-header">
+                        <div class="class-info">
+                            <h3>${classItem.name}</h3>
+                            <div class="class-subject">${classItem.subject} • Phòng ${classItem.room}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="class-stats">
+                        <div class="stat-item">
+                            <span class="stat-icon">👥</span>
+                            <span>Tổng sĩ số: <strong>${classItem.totalStudents}</strong></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">✅</span>
+                            <span>Có mặt hôm nay: <strong>${classItem.presentToday}</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div class="attendance-rate">
+                        <div class="attendance-circle" style="background: ${attendanceColor}">
+                            ${attendanceRate}%
+                        </div>
+                        <div style="font-size: 14px; color: #666;">Tỷ lệ điểm danh</div>
+                    </div>
+                    
+                    <div class="class-actions">
+                        <button class="action-btn attendance-btn" onclick="takeAttendance(${classItem.id})">
+                            <span>📝</span>
+                            Điểm danh
+                        </button>
+                        <button class="action-btn students-btn" onclick="viewStudents(${classItem.id})">
+                            <span>👨‍🎓</span>
+                            Xem học sinh
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(classCard);
+            });
+        }
+
+        function showProfileModal() {
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function hideProfileModal() {
+            document.getElementById('profileModal').classList.remove('show');
+        }
+
+        function showAddClassModal() {
+            document.getElementById('addClassModal').classList.add('show');
+        }
+
+        function hideAddClassModal() {
+            document.getElementById('addClassModal').classList.remove('show');
+            // Clear form
+            document.getElementById('className').value = '';
+            document.getElementById('classSubject').value = '';
+            document.getElementById('classGrade').value = '';
+            document.getElementById('classRoom').value = '';
+            document.getElementById('totalStudents').value = '';
+        }
+
+        function updateProfile() {
+            const name = document.getElementById('teacherName').value;
+            const email = document.getElementById('teacherEmail').value;
+            const phone = document.getElementById('teacherPhone').value;
+            const subject = document.getElementById('teacherSubject').value;
+            const experience = document.getElementById('teacherExperience').value;
+
+            // Update profile display
+            document.querySelector('.user-profile div div').textContent = `Thầy ${name}`;
+            
+            alert('Cập nhật thông tin thành công!');
+            hideProfileModal();
+        }
+
+        function addClass() {
+            const name = document.getElementById('className').value;
+            const subject = document.getElementById('classSubject').value;
+            const grade = document.getElementById('classGrade').value;
+            const room = document.getElementById('classRoom').value;
+            const totalStudents = parseInt(document.getElementById('totalStudents').value);
+
+            if (!name || !subject || !grade || !room || !totalStudents) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            const newClass = {
+                id: classes.length + 1,
+                name,
+                subject,
+                grade,
+                room,
+                totalStudents,
+                presentToday: totalStudents // Assume all present initially
+            };
+
+            classes.push(newClass);
+            renderClasses();
+            hideAddClassModal();
+            alert('Thêm lớp học thành công!');
+        }
+
+        function takeAttendance(classId) {
+            const classItem = classes.find(c => c.id === classId);
+            alert(`Đang mở trang điểm danh cho ${classItem.name}`);
+            // Here you would navigate to attendance page
+        }
+
+        function viewStudents(classId) {
+            const classItem = classes.find(c => c.id === classId);
+            alert(`Đang xem danh sách học sinh của ${classItem.name}`);
+            // Here you would navigate to students list page
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const profileModal = document.getElementById('profileModal');
+            const addClassModal = document.getElementById('addClassModal');
+            
+            if (event.target === profileModal) {
+                hideProfileModal();
+            }
+            if (event.target === addClassModal) {
+                hideAddClassModal();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderClasses();
+        });
+    </script>
+</body>
+</html>

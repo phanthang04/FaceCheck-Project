@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 50px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover { color: #333; }
+
+        .login-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group { margin-bottom: 25px; }
+
+        .form-input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e5e5e5;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-input:focus {
+            border-color: #ff6b6b;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .form-input::placeholder { color: #aaa; }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(45deg, #ff5252, #ff6b6b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .forgot-password a {
+            color: #4285f4;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .forgot-password a:hover { text-decoration: underline; }
+
+        .signup-prompt {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .signup-prompt a {
+            color: #4285f4;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .signup-prompt a:hover { text-decoration: underline; }
+
+        /* 🔴 Thanh báo lỗi */
+        .error-bar, .success-bar {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            animation: fadeIn 0.3s ease-in-out;
+            display: none;
+        }
+
+        .error-bar {
+            background: #ff4d4f;
+            color: white;
+        }
+
+        .success-bar {
+            background: #4caf50;
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 500px) {
+            .login-container { padding: 30px 25px; margin: 10px; }
+            .login-title { font-size: 28px; }
+            .form-input, .login-btn { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+        
+        <h2 class="login-title">Đăng Nhập</h2>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <input type="text" class="form-input" placeholder="Email đăng nhập" required id="email">
+            </div>
+            
+            <div class="form-group">
+                <input type="password" class="form-input" placeholder="Mật khẩu" required id="password">
+            </div>
+            
+            <button type="submit" class="login-btn">Đăng Nhập</button>
+
+            <!-- Thanh báo -->
+            <div id="errorBar" class="error-bar"></div>
+            <div id="successBar" class="success-bar"></div>
+        </form>
+        
+        <div class="forgot-password">
+            <a href="#" onclick="forgotPassword()">🔒 Quên mật khẩu?</a>
+        </div>
+        
+        <div class="signup-prompt">
+            Bạn chưa có tài khoản? <a onclick="signUp()">Đăng ký ngay</a>
+        </div>
+    </div>
+
+    <script>
+        function showError(message) {
+            const errorBar = document.getElementById("errorBar");
+            const successBar = document.getElementById("successBar");
+            successBar.style.display = "none"; // ẩn success nếu có
+            errorBar.innerText = message;
+            errorBar.style.display = "block";
+            setTimeout(() => { errorBar.style.display = "none"; }, 3000);
+        }
+
+        function showSuccess(message) {
+            const errorBar = document.getElementById("errorBar");
+            const successBar = document.getElementById("successBar");
+            errorBar.style.display = "none"; // ẩn error nếu có
+            successBar.innerText = message;
+            successBar.style.display = "block";
+            setTimeout(() => { successBar.style.display = "none"; }, 3000);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (!username || !password) {
+                showError("Vui lòng nhập đầy đủ thông tin!");
+                return;
+            }
+            
+    console.log("Login body:", {username, password});
+            try {
+                const response = await fetch("/api/account/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    localStorage.setItem("token", result.token);
+                    showSuccess("Đăng nhập thành công!");
+                    setTimeout(() => window.location.href = "/", 1500);
+                } else {
+                    showError(result.message || "Sai email hoặc mật khẩu");
+                }
+            } catch (error) {
+                console.error("Lỗi khi đăng nhập:", error);
+                showError("Không thể kết nối tới server!");
+            }
+        }
+
+        function closeModal() {
+            const container = document.querySelector('.login-container');
+            container.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+                alert('Đóng form đăng nhập');
+            }, 300);
+        }
+
+        function forgotPassword() { alert('Chức năng quên mật khẩu sẽ được triển khai sau!'); }
+        function signUp() { window.location.href = "/signUp"; }
+
+        // Hiệu ứng input
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Thêm animation slideOut
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-30px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
