@@ -110,13 +110,11 @@
                 <a href="/" class="btn btn-secondary">⬅ Quay lại</a>
                 <h1 style="margin-top: 10px;">📂 Tài liệu lớp: <span id="className">Đang tải...</span></h1>
             </div>
-            <button class="btn btn-primary" onclick="triggerUpload()">
-                ☁ Upload Tài Liệu
-            </button>
+
             <input type="file" id="fileInput" hidden onchange="handleFileSelect(this)">
         </div>
 
-        <div class="upload-section" id="dropZone">
+        <div class="upload-section" id="dropZone" onclick="triggerUpload()">
             <div class="upload-icon">⬇</div>
             <h3>Kéo thả file vào đây hoặc click để upload</h3>
             <p style="color: #718096; margin-top: 5px;">Hỗ trợ PDF, Word, Excel, PowerPoint, Ảnh</p>
@@ -209,8 +207,9 @@
                 formData.append('classId', classId);
 
                 // Show loading state
-                const originalText = document.querySelector('.btn-primary').innerHTML;
-                document.querySelector('.btn-primary').textContent = '⏳ Đang upload...';
+                const dropZoneHeader = document.querySelector('#dropZone h3');
+                const originalText = dropZoneHeader.innerText;
+                dropZoneHeader.innerText = '⏳ Đang upload...';
 
                 try {
                     const res = await fetch('/api/document/upload', {
@@ -228,7 +227,7 @@
                     console.error(error);
                     alert('Lỗi upload file');
                 } finally {
-                    document.querySelector('.btn-primary').innerHTML = originalText;
+                    dropZoneHeader.innerText = originalText;
                     input.value = ''; // Reset
                 }
             }
