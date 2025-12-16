@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điểm Danh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #video {
+            width: 100%;
+            display: block;
+        }
+
+        .canvas-container {
+            display: none;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .result-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item.success {
+            border-left-color: #28a745;
+        }
+
+        .result-item.error {
+            border-left-color: #dc3545;
+        }
+
+        .result-item h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .result-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .auto-capture-info {
+            text-align: center;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Điểm Danh</h1>
+
+        <form id="attendanceForm">
+            <div class="form-group">
+                <label for="classId">Chọn lớp (không bắt buộc):</label>
+                <select id="classId" name="classId">
+                    <option value="">-- Tùy chọn --</option>
+                </select>
+                <small style="color:#555;">Bạn có thể bỏ trống, hệ thống vẫn nhận diện và trả về tên.</small>
+            </div>
+
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <div class="auto-capture-info" id="autoCaptureInfo" style="display: none;">
+                Đang tự động chụp và nhận diện mỗi 3 giây...
+            </div>
+
+            <div class="controls">
+                <button type="button" id="startCamera" class="btn-primary">Bật Camera</button>
+                <button type="button" id="checkBtn" class="btn-success" disabled>Điểm Danh</button>
+                <button type="button" id="autoCheckBtn" class="btn-primary" disabled>Điểm Danh Tự Động</button>
+                <button type="button" id="finishBtn" class="btn-danger" disabled>Kết Thúc Điểm Danh</button>
+                <button type="button" id="stopCamera" class="btn-danger" disabled>Tắt Camera</button>
+            </div>
+
+            <div id="status"></div>
+
+            <div class="result-container" id="resultContainer" style="display: none;">
+                <h2 style="margin-bottom: 20px;">Kết quả điểm danh:</h2>
+                <div id="results"></div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startCamera');
+        const checkBtn = document.getElementById('checkBtn');
+        const autoCheckBtn = document.getElementById('autoCheckBtn');
+        const finishBtn = document.getElementById('finishBtn');
+        const stopBtn = document.getElementById('stopCamera');
+        const statusDiv = document.getElementById('status');
+        const classSelect = document.getElementById('classId');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultsDiv = document.getElementById('results');
+        const autoCaptureInfo = document.getElementById('autoCaptureInfo');
+
+        let stream = null;
+        let autoCheckInterval = null;
+        let isAutoChecking = false;
+        let presentStudents = new Set(); // Track present IDs
+        
+        // Load danh sách lớp (tùy chọn)
+        async function loadClasses() {
+            try {
+                const response = await fetch('/api/class/getClass');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    classSelect.innerHTML = '<option value=\"\">-- Tùy chọn --</option>';
+                    result.data.forEach(cls => {
+                        const option = document.createElement('option');
+                        option.value = cls.id;
+                        option.textContent = `${cls.nameClass} - ${cls.subject}`;
+                        classSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading classes:', error);
+            }
+        }
+
+        classSelect.addEventListener('change', () => {
+             // Reset present list when class changes
+             presentStudents.clear();
+             resultsDiv.innerHTML = '';
+             resultContainer.style.display = 'none';
+             if (classSelect.value) {
+                 finishBtn.disabled = false;
+             } else {
+                 finishBtn.disabled = true;
+             }
+        });
+
+        async function finishAttendance() {
+            const classId = classSelect.value;
+            if (!classId) return;
+
+            if (!confirm(`Bạn có chắc muốn kết thúc điểm danh cho lớp này?\nNhững học sinh chưa được check sẽ bị đánh dấu vắng.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/student/finishAttendance', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                         classId: classId,
+                         presentStudentIds: Array.from(presentStudents)
+                     })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message); // Hiển thị số lượng vắng
+                    // Có thể redirect hoặc reset
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + result.message);
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert('Lỗi kết nối server');
+            }
+        }
+
+        function showStatus(message, type = 'info') {
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusDiv.style.display = 'none';
+        }
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    }
+                });
+                video.srcObject = stream;
+                startBtn.disabled = true;
+                checkBtn.disabled = false;
+                autoCheckBtn.disabled = false;
+                stopBtn.disabled = false;
+                if(classSelect.value) finishBtn.disabled = false;
+
+                showStatus('Camera đã bật. Sẵn sàng điểm danh.', 'success');
+            } catch (error) {
+                showStatus('Không thể truy cập camera: ' + error.message, 'error');
+                console.error('Camera error:', error);
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+            if (autoCheckInterval) {
+                clearInterval(autoCheckInterval);
+                autoCheckInterval = null;
+                isAutoChecking = false;
+                autoCheckBtn.textContent = 'Điểm Danh Tự Động';
+                autoCaptureInfo.style.display = 'none';
+            }
+            startBtn.disabled = false;
+            checkBtn.disabled = true;
+            autoCheckBtn.disabled = true;
+            stopBtn.disabled = true;
+            showStatus('Camera đã tắt.', 'info');
+        }
+
+        function captureImage() {
+            if (!stream) return null;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+
+            return canvas.toDataURL('image/jpeg', 0.8);
+        }
+
+        async function checkAttendance() {
+            const imageData = captureImage();
+            if (!imageData) {
+                showStatus('Không thể chụp ảnh!', 'error');
+                return;
+            }
+
+            const classId = classSelect.value;
+            
+            showStatus('Đang nhận diện...', 'info');
+
+            try {
+                // Convert base64 to blob
+                const response = await fetch(imageData);
+                const blob = await response.blob();
+                
+                // Create form data
+                const formData = new FormData();
+                formData.append('image', blob, 'attendance.jpg');
+                if (classId) {
+                    formData.append('classId', classId);
+                }
+
+                const uploadResponse = await fetch('/api/students/done', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await uploadResponse.json();
+
+                if (result.success && result.data) {
+                    const { students, warnings } = result.data;
+                    const totalCount = (students ? students.length : 0);
+                    
+                    if (students) {
+                        students.forEach(s => presentStudents.add(s.student_id));
+                    }
+
+                    if (totalCount > 0) {
+                         showStatus(`Đã điểm danh ${totalCount} học sinh!`, 'success');
+                    } else if (warnings && warnings.length > 0) {
+                         showStatus(`Có cảnh báo cho ${warnings.length} trường hợp.`, 'warning');
+                    } else {
+                         showStatus('Không nhận diện được học sinh nào', 'warning');
+                    }
+
+                    displayResults(students || [], warnings || []);
+                } else {
+                    showStatus(result.message || 'Lỗi xử lý', 'error');
+                }
+            } catch (error) {
+                showStatus('Lỗi: ' + error.message, 'error');
+                console.error('Check attendance error:', error);
+            }
+        }
+
+        function displayResults(students, warnings) {
+            resultContainer.style.display = 'block';
+            resultsDiv.innerHTML = '';
+
+            // Display success
+            students.forEach((student, index) => {
+                const div = document.createElement('div');
+                div.className = 'result-item success';
+                div.innerHTML = `
+                    <h3>✅ ${student.student_name || student.student_id}</h3>
+                    <p><strong>Mã học sinh:</strong> ${student.student_id}</p>
+                    <p><strong>Thời gian:</strong> ${new Date(student.timestamp || Date.now()).toLocaleString('vi-VN')}</p>
+                `;
+                resultsDiv.appendChild(div);
+            });
+
+            // Display warnings
+            warnings.forEach((warning, index) => {
+                const div = document.createElement('div');
+                div.className = 'result-item warning'; // Or error style
+                div.style.borderLeftColor = '#ffc107';
+                div.innerHTML = `
+                    <h3>⚠️ ${warning.student_name || 'Unknown'}</h3>
+                    <p><strong>Thông báo:</strong> ${warning.message}</p>
+                `;
+                resultsDiv.appendChild(div);
+            });
+        }
+
+        function toggleAutoCheck() {
+            if (isAutoChecking) {
+                clearInterval(autoCheckInterval);
+                autoCheckInterval = null;
+                isAutoChecking = false;
+                autoCheckBtn.textContent = 'Điểm Danh Tự Động';
+                autoCaptureInfo.style.display = 'none';
+                showStatus('Đã dừng điểm danh tự động.', 'info');
+            } else {
+                isAutoChecking = true;
+                autoCheckBtn.textContent = 'Dừng Điểm Danh';
+                autoCaptureInfo.style.display = 'block';
+                checkAttendance(); // Chụp ngay
+                autoCheckInterval = setInterval(() => {
+                    checkAttendance();
+                }, 3000); // Chụp mỗi 3 giây
+                showStatus('Đang điểm danh tự động...', 'info');
+            }
+        }
+
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+        checkBtn.addEventListener('click', checkAttendance);
+        autoCheckBtn.addEventListener('click', toggleAutoCheck);
+        finishBtn.addEventListener('click', finishAttendance);
+
+        // Load classes on page load
+        loadClasses();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopCamera();
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký Khuôn mặt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #video {
+            width: 100%;
+            display: block;
+        }
+
+        .canvas-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        #canvas {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 12px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .capture-count {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            margin: 15px 0;
+        }
+
+        .recommendation {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1976d2;
+        }
+
+        .recommendation strong {
+            color: #0d47a1;
+        }
+
+        .recommendation.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .recommendation.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .preview-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .preview-image {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-image .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 Đăng ký Khuôn mặt</h1>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="studentId">Mã học sinh:</label>
+                <input type="text" id="studentId" name="studentId" required placeholder="VD: SV001">
+            </div>
+
+            <div class="form-group">
+                <label for="studentName">Tên học sinh:</label>
+                <input type="text" id="studentName" name="studentName" required placeholder="VD: NguyenVanA">
+            </div>
+
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <div class="capture-count">
+                Đã chụp: <span id="captureCount">0</span> ảnh
+                <div class="recommendation" id="recommendation">
+                    <small>💡 Khuyến nghị: Chụp ít nhất <strong>5-10 ảnh</strong> với các góc độ khác nhau để đạt độ chính xác tốt nhất</small>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button type="button" id="startCamera" class="btn-primary">Bật Camera</button>
+                <button type="button" id="captureBtn" class="btn-success" disabled>Chụp Ảnh</button>
+                <button type="button" id="stopCamera" class="btn-danger" disabled>Tắt Camera</button>
+                <button type="button" id="autoCaptureBtn" class="btn-primary" disabled>Chụp Tự Động</button>
+            </div>
+
+            <div id="status"></div>
+
+            <div class="preview-images" id="previewContainer"></div>
+
+            <div class="controls" style="margin-top: 30px;">
+                <button type="submit" id="submitBtn" class="btn-success" disabled>Lưu Tất Cả</button>
+                <button type="button" id="clearBtn" class="btn-secondary">Xóa Tất Cả</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startCamera');
+        const captureBtn = document.getElementById('captureBtn');
+        const stopBtn = document.getElementById('stopCamera');
+        const autoCaptureBtn = document.getElementById('autoCaptureBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const statusDiv = document.getElementById('status');
+        const captureCountSpan = document.getElementById('captureCount');
+        const previewContainer = document.getElementById('previewContainer');
+        const registerForm = document.getElementById('registerForm');
+
+        let stream = null;
+        let capturedImages = [];
+        let autoCaptureInterval = null;
+        let isAutoCapturing = false;
+
+        function showStatus(message, type = 'info') {
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusDiv.style.display = 'none';
+        }
+
+        function updateCaptureCount() {
+            const count = capturedImages.length;
+            captureCountSpan.textContent = count;
+            submitBtn.disabled = count === 0;
+            
+            // Update recommendation based on count
+            const recommendation = document.getElementById('recommendation');
+            if (count === 0) {
+                recommendation.innerHTML = '<small>💡 Khuyến nghị: Chụp ít nhất <strong>5-10 ảnh</strong> với các góc độ khác nhau để đạt độ chính xác tốt nhất</small>';
+                recommendation.className = 'recommendation';
+            } else if (count < 3) {
+                recommendation.innerHTML = `<small>⚠️ Chưa đủ: Hiện có ${count} ảnh. Nên chụp thêm <strong>ít nhất 3-7 ảnh nữa</strong> với các góc độ khác nhau (chính diện, nghiêng trái, nghiêng phải, nhìn lên, nhìn xuống)</small>`;
+                recommendation.className = 'recommendation warning';
+            } else if (count < 5) {
+                recommendation.innerHTML = `<small>📸 Tốt: Đã có ${count} ảnh. Nên chụp thêm <strong>2-5 ảnh nữa</strong> để tăng độ chính xác. Thử các góc độ và điều kiện ánh sáng khác nhau</small>`;
+                recommendation.className = 'recommendation';
+            } else if (count < 10) {
+                recommendation.innerHTML = `<small>✅ Tốt: Đã có ${count} ảnh. Có thể chụp thêm <strong>vài ảnh nữa</strong> để đạt độ chính xác tối ưu</small>`;
+                recommendation.className = 'recommendation success';
+            } else {
+                recommendation.innerHTML = `<small>🎉 Xuất sắc: Đã có ${count} ảnh! Đủ để nhận diện với độ chính xác cao</small>`;
+                recommendation.className = 'recommendation success';
+            }
+        }
+
+        function updatePreview() {
+            previewContainer.innerHTML = '';
+            capturedImages.forEach((imageData, index) => {
+                const div = document.createElement('div');
+                div.className = 'preview-image';
+                div.innerHTML = `
+                    <img src="${imageData}" alt="Ảnh ${index + 1}">
+                    <button type="button" class="remove" onclick="removeImage(${index})">×</button>
+                `;
+                previewContainer.appendChild(div);
+            });
+        }
+
+        window.removeImage = function(index) {
+            capturedImages.splice(index, 1);
+            updatePreview();
+            updateCaptureCount();
+        };
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    }
+                });
+                video.srcObject = stream;
+                startBtn.disabled = true;
+                captureBtn.disabled = false;
+                stopBtn.disabled = false;
+                autoCaptureBtn.disabled = false;
+                showStatus('Camera đã bật. Bạn có thể chụp ảnh.', 'success');
+            } catch (error) {
+                showStatus('Không thể truy cập camera: ' + error.message, 'error');
+                console.error('Camera error:', error);
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+            if (autoCaptureInterval) {
+                clearInterval(autoCaptureInterval);
+                autoCaptureInterval = null;
+                isAutoCapturing = false;
+                autoCaptureBtn.textContent = 'Chụp Tự Động';
+            }
+            startBtn.disabled = false;
+            captureBtn.disabled = true;
+            stopBtn.disabled = true;
+            autoCaptureBtn.disabled = true;
+            showStatus('Camera đã tắt.', 'info');
+        }
+
+        function captureImage() {
+            if (!stream) return;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            capturedImages.push(imageData);
+            updatePreview();
+            updateCaptureCount();
+            showStatus(`Đã chụp ảnh ${capturedImages.length}`, 'success');
+        }
+
+        function toggleAutoCapture() {
+            if (isAutoCapturing) {
+                clearInterval(autoCaptureInterval);
+                autoCaptureInterval = null;
+                isAutoCapturing = false;
+                autoCaptureBtn.textContent = 'Chụp Tự Động';
+                showStatus('Đã dừng chụp tự động.', 'info');
+            } else {
+                isAutoCapturing = true;
+                autoCaptureBtn.textContent = 'Dừng Chụp';
+                captureImage(); // Chụp ngay
+                autoCaptureInterval = setInterval(() => {
+                    captureImage();
+                }, 2000); // Chụp mỗi 2 giây
+                showStatus('Đang chụp tự động mỗi 2 giây...', 'info');
+            }
+        }
+
+        async function submitImages() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+
+            if (!studentId || !studentName) {
+                showStatus('Vui lòng nhập đầy đủ thông tin!', 'error');
+                return;
+            }
+
+            if (capturedImages.length === 0) {
+                showStatus('Vui lòng chụp ít nhất 1 ảnh!', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            showStatus('Đang lưu ảnh...', 'info');
+
+            try {
+                let successCount = 0;
+                let failCount = 0;
+
+                for (let i = 0; i < capturedImages.length; i++) {
+                    const imageData = capturedImages[i];
+                    
+                    // Convert base64 to blob
+                    const response = await fetch(imageData);
+                    const blob = await response.blob();
+                    
+                    // Create form data
+                    const formData = new FormData();
+                    formData.append('image', blob, `face_${i + 1}.jpg`);
+                    formData.append('studentId', studentId);
+                    formData.append('studentName', studentName);
+
+                    try {
+                        const uploadResponse = await fetch('/api/students/registerFace', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await uploadResponse.json();
+                        if (result.success) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                            console.error('Upload failed:', result.message);
+                        }
+                    } catch (error) {
+                        failCount++;
+                        console.error('Upload error:', error);
+                    }
+                }
+
+                if (successCount > 0) {
+                    showStatus(`Đã lưu thành công ${successCount}/${capturedImages.length} ảnh!`, 'success');
+                    setTimeout(() => {
+                        capturedImages = [];
+                        updatePreview();
+                        updateCaptureCount();
+                        document.getElementById('studentId').value = '';
+                        document.getElementById('studentName').value = '';
+                        hideStatus();
+                    }, 2000);
+                } else {
+                    showStatus('Không thể lưu ảnh. Vui lòng thử lại!', 'error');
+                }
+            } catch (error) {
+                showStatus('Lỗi: ' + error.message, 'error');
+                console.error('Submit error:', error);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+        captureBtn.addEventListener('click', captureImage);
+        autoCaptureBtn.addEventListener('click', toggleAutoCapture);
+        clearBtn.addEventListener('click', () => {
+            if (confirm('Bạn có chắc muốn xóa tất cả ảnh đã chụp?')) {
+                capturedImages = [];
+                updatePreview();
+                updateCaptureCount();
+                showStatus('Đã xóa tất cả ảnh.', 'info');
+            }
+        });
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            submitImages();
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopCamera();
+        });
+    </script>
+</body>
+</html>
+

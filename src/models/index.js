@@ -1,8 +1,12 @@
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import Sequelize from "sequelize";
 import process from "process";
-import configFile from "../config/config.json" with { type: "json" }; // ✅ sửa ở đây
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const configFile = JSON.parse(fs.readFileSync(path.join(__dirname, "../config/config.json"), "utf-8"));
 
 const basename = path.basename(new URL(import.meta.url).pathname);
 const env = process.env.NODE_ENV || "development";

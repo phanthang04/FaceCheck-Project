@@ -112,6 +112,28 @@
             box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
         }
 
+        .attendance-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .attendance-btn:hover {
+            background: #0069d9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+        }
+
         .classes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -409,15 +431,19 @@
     <div class="container">
         <div class="header">
             <h1>🎓 Quản Lý Lớp Học</h1>
-            <div class="user-profile" onclick="showProfileModal()">
-                <div class="avatar">👨‍🏫</div>
-                <div>
-                    <div id = "teacherName" style="font-weight: 600;"></div>
-                    <div id = "teacherNameDisplay" style="font-size: 12px; opacity: 0.8;"></div>
+            <div style="display:flex; gap:12px; align-items:center;">
+                <a href="/attendance" class="attendance-btn">🚀 Điểm danh</a>
+                <div class="user-profile" onclick="showProfileModal()">
+                    <div class="avatar">👨‍🏫</div>
+                    <div>
+                        <div id = "teacherName" style="font-weight: 600;"></div>
+                        <div id = "teacherNameDisplay" style="font-size: 12px; opacity: 0.8;"></div>
+                    </div>
                 </div>
             </div>
         </div>
 <script>
+
     async function loadUserInfo() {
         try {
             const response = await fetch("api/account/getInfor", {
@@ -447,6 +473,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         renderClasses();
         loadUserInfo();
+        loadClasses();
     });
 </script>
 
@@ -467,56 +494,7 @@
         </div>
     </div>
 
-    <!-- Profile Modal -->
-    <div class="modal" id="profileModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Thông Tin Cá Nhân</h2>
-                <button class="close-btn" onclick="hideProfileModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="info-item">
-                    <div class="info-icon">👤</div>
-                    <div>
-                        <div style="font-weight: 600;">Họ và tên</div>
-                        <input type="text" class="form-input" id="teacherName" value="Nguyễn Văn An">
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-icon">📧</div>
-                    <div>
-                        <div style="font-weight: 600;">Email</div>
-                        <input type="email" class="form-input" id="teacherEmail" value="nguyenvanan@school.edu.vn">
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-icon">📱</div>
-                    <div>
-                        <div style="font-weight: 600;">Số điện thoại</div>
-                        <input type="tel" class="form-input" id="teacherPhone" value="0123456789">
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-icon">📚</div>
-                    <div>
-                        <div style="font-weight: 600;">Bộ môn</div>
-                        <input type="text" class="form-input" id="teacherSubject" value="Toán - Lý">
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-icon">⏱️</div>
-                    <div>
-                        <div style="font-weight: 600;">Kinh nghiệm</div>
-                        <input type="text" class="form-input" id="teacherExperience" value="15 năm">
-                    </div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button class="btn btn-secondary" onclick="hideProfileModal()">Hủy</button>
-                <button class="btn btn-primary" onclick="updateProfile()">Cập Nhật</button>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Add Class Modal -->
     <div class="modal" id="addClassModal">
@@ -535,21 +513,8 @@
                     <input type="text" class="form-input" id="classSubject" placeholder="VD: Toán">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Khối</label>
-                    <select class="form-input" id="classGrade">
-                        <option value="">Chọn khối</option>
-                        <option value="10">Khối 10</option>
-                        <option value="11">Khối 11</option>
-                        <option value="12">Khối 12</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label class="form-label">Phòng học</label>
                     <input type="text" class="form-input" id="classRoom" placeholder="VD: A101">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Sĩ số</label>
-                    <input type="number" class="form-input" id="totalStudents" placeholder="VD: 35" min="1" max="50">
                 </div>
             </div>
             <div class="form-actions">
@@ -561,35 +526,30 @@
 
     <script>
         // Sample data
-        let classes = [
-            {
-                id: 1,
-                name: 'Lớp 10A1',
-                subject: 'Toán',
-                totalStudents: 35,
-                presentToday: 32,
-                grade: '10',
-                room: 'A101'
-            },
-            {
-                id: 2,
-                name: 'Lớp 11B2',
-                subject: 'Vật Lý',
-                totalStudents: 30,
-                presentToday: 28,
-                grade: '11',
-                room: 'B205'
-            },
-            {
-                id: 3,
-                name: 'Lớp 12C3',
-                subject: 'Hóa Học',
-                totalStudents: 28,
-                presentToday: 26,
-                grade: '12',
-                room: 'C304'
+        let classes = [];
+
+        async function loadClasses() {
+            try {
+                const response = await fetch("api/class/getClass", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include"
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    classes = result.data; // chú ý phải lấy result.data chứ không phải result
+                    renderClasses();
+                } else {
+                    console.log(result.message);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy thông tin lớp:", error);
             }
-        ];
+        }
 
         // Functions
         function renderClasses() {
@@ -605,7 +565,7 @@
                 classCard.innerHTML = `
                     <div class="class-header">
                         <div class="class-info">
-                            <h3>${classItem.name}</h3>
+                            <h3>${classItem.nameClass}</h3>
                             <div class="class-subject">${classItem.subject} • Phòng ${classItem.room}</div>
                         </div>
                     </div>
@@ -613,25 +573,16 @@
                     <div class="class-stats">
                         <div class="stat-item">
                             <span class="stat-icon">👥</span>
-                            <span>Tổng sĩ số: <strong>${classItem.totalStudents}</strong></span>
+                            <span>Tổng sĩ số: <strong>${classItem.total}</strong></span>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-icon">✅</span>
-                            <span>Có mặt hôm nay: <strong>${classItem.presentToday}</strong></span>
-                        </div>
+                        
                     </div>
                     
-                    <div class="attendance-rate">
-                        <div class="attendance-circle" style="background: ${attendanceColor}">
-                            ${attendanceRate}%
-                        </div>
-                        <div style="font-size: 14px; color: #666;">Tỷ lệ điểm danh</div>
-                    </div>
                     
                     <div class="class-actions">
-                        <button class="action-btn attendance-btn" onclick="takeAttendance(${classItem.id})">
-                            <span>📝</span>
-                            Điểm danh
+                        <button class="action-btn attendance-btn" onclick="viewDocuments(${classItem.id})">
+                            <span>📂</span>
+                            Tài liệu
                         </button>
                         <button class="action-btn students-btn" onclick="viewStudents(${classItem.id})">
                             <span>👨‍🎓</span>
@@ -660,7 +611,6 @@
             // Clear form
             document.getElementById('className').value = '';
             document.getElementById('classSubject').value = '';
-            document.getElementById('classGrade').value = '';
             document.getElementById('classRoom').value = '';
             document.getElementById('totalStudents').value = '';
         }
@@ -679,45 +629,52 @@
             hideProfileModal();
         }
 
-        function addClass() {
+        async function addClass() {
             const name = document.getElementById('className').value;
             const subject = document.getElementById('classSubject').value;
-            const grade = document.getElementById('classGrade').value;
             const room = document.getElementById('classRoom').value;
-            const totalStudents = parseInt(document.getElementById('totalStudents').value);
 
-            if (!name || !subject || !grade || !room || !totalStudents) {
+            if (!name || !subject || !room) {
                 alert('Vui lòng điền đầy đủ thông tin!');
                 return;
             }
 
             const newClass = {
-                id: classes.length + 1,
                 name,
                 subject,
-                grade,
-                room,
-                totalStudents,
-                presentToday: totalStudents // Assume all present initially
+                room
             };
+            try {
+                const response = await fetch("/api/class/addClass", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newClass)
+                });
 
-            classes.push(newClass);
+                const result = await response.json();
+
+                if (result.success) {
+                    loadClasses()
+                    renderClasses()
+                } else {
+                    console.log(error)
+                }
+            } catch (error) {
+                console.log(error)
+            }
             renderClasses();
             hideAddClassModal();
-            alert('Thêm lớp học thành công!');
         }
 
-        function takeAttendance(classId) {
-            const classItem = classes.find(c => c.id === classId);
-            alert(`Đang mở trang điểm danh cho ${classItem.name}`);
-            // Here you would navigate to attendance page
+        function viewDocuments(classId) {
+             window.location.href = `/documents?classId=${classId}`;
         }
 
-        function viewStudents(classId) {
-            const classItem = classes.find(c => c.id === classId);
-            alert(`Đang xem danh sách học sinh của ${classItem.name}`);
-            // Here you would navigate to students list page
+       function viewStudents(classId) {
+            // const classItem = classes.find(c => c.id === classId);
+            window.location.href = `/studentsList?classId=${classId}`;
         }
+
 
         // Close modals when clicking outside
         window.onclick = function(event) {

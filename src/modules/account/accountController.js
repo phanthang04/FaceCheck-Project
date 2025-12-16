@@ -3,6 +3,15 @@ import Account from "./account.js";
 export async function login(req, res) {
     const {username, password} = req.body;
 
+    // Validation
+    if (!username || !password) {
+        return res.status(400).json({
+            status: 400,
+            success: false,
+            message: "Thiếu tên đăng nhập hoặc mật khẩu"
+        });
+    }
+
     try {
         const user = await Account.findOne({
             where: { username: username }
@@ -10,13 +19,15 @@ export async function login(req, res) {
         if (!user){
             return res.status(200).json({
                 status: 200,
-                success: true,
+                success: false,
                 result: false,
                 message: "Không tìm thấy"
             });
         }
+        // Simple password comparison (in production, use bcrypt)
         if (user.password === password){
             req.session.accountId = user.id;
+            req.session.username = user.username;
             return res.status(200).json({
                 status: 200,
                 success: true,
@@ -26,7 +37,7 @@ export async function login(req, res) {
         }
         return res.status(200).json({
                 status: 200,
-                success: true,
+                success: false,
                 result: false,
                 message: "Sai mật khẩu"
             });
@@ -41,6 +52,24 @@ export async function login(req, res) {
 
 export async function signUp(req, res) {
     const {fName, lName, username, password} = req.body;
+    
+    // Validation
+    if (!fName || !lName || !username || !password) {
+        return res.status(400).json({
+            status: 400,
+            success: false,
+            message: "Thiếu thông tin đăng ký"
+        });
+    }
+    
+    if (password.length < 6) {
+        return res.status(400).json({
+            status: 400,
+            success: false,
+            message: "Mật khẩu phải có ít nhất 6 ký tự"
+        });
+    }
+    
     try {
         const user = await Account.findOne({
             where: { username: username }

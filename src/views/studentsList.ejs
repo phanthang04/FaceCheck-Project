@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Danh Sách Học Sinh</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header h1 {
+        font-size: 32px;
+        color: #333;
+      }
+
+      .header .total-count {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .class-selector {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .class-btn {
+        padding: 15px 30px;
+        margin-right: 15px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f0f0f0;
+        color: #666;
+      }
+
+      .class-btn.active {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+      }
+
+      .search-section {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        gap: 15px;
+      }
+
+      .search-box {
+        flex: 1;
+        position: relative;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 15px 15px 15px 45px;
+        border: 2px solid #e5e5e5;
+        border-radius: 12px;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+
+      .search-box input:focus {
+        border-color: #667eea;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+      }
+
+      .add-btn {
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .add-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+      }
+
+      .student-list {
+        display: grid;
+        gap: 20px;
+      }
+
+      .student-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: transform 0.3s;
+      }
+
+      .student-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .student-info {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        flex: 1;
+      }
+
+      .avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .details {
+        flex: 1;
+      }
+
+      .student-name {
+        font-size: 22px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .info-item {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .action-btn {
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .edit-btn {
+        background: #dbeafe;
+        color: #3b82f6;
+      }
+
+      .delete-btn {
+        background: #fee2e2;
+        color: #ef4444;
+      }
+
+      .action-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal.show {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-content h2 {
+        font-size: 24px;
+        margin-bottom: 25px;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e5e5e5;
+        border-radius: 12px;
+        font-size: 16px;
+        outline: none;
+      }
+
+      .form-group input:focus {
+        border-color: #667eea;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+      }
+
+      .modal-btn {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .cancel-btn {
+        background: #e5e5e5;
+        color: #666;
+      }
+
+      .submit-btn {
+        background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+        color: white;
+      }
+
+      .no-results {
+        background: white;
+        border-radius: 20px;
+        padding: 60px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .no-results p {
+        color: #999;
+        font-size: 18px;
+      }
+
+      /* New CSS from registerFace.ejs */
+      .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .recommendation {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1976d2;
+        }
+
+        .recommendation strong {
+            color: #0d47a1;
+        }
+
+        .recommendation.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .recommendation.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .preview-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .preview-image {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-image .remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div>
+          <h1>🎓 Danh Sách Học Sinh</h1>
+          <p style="color: #666; margin-top: 8px">
+            Lớp: <span id="currentClass"></span>
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="total-count">👥 Tổng số: <span id="totalCount">0</span></div>
+            <button id="deleteClassBtn" onclick="handleDeleteCurrentClass()" class="action-btn delete-btn" style="display: none; height: fit-content;">
+              Xóa
+            </button>
+        </div>
+      </div>
+
+      <div id="classSelector" class="class-selector"></div>
+
+      <div class="search-section">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Tìm kiếm theo tên hoặc mã học sinh..."
+            oninput="filterStudents()"
+          />
+        </div>
+        <button class="add-btn" onclick="openModal()">➕ Thêm Học Sinh</button>
+      </div>
+
+      <div class="student-list" id="studentList"></div>
+    </div>
+
+    <div class="modal" id="addModal">
+      <div class="modal-content" style="max-width: 800px">
+        <h2>Thêm Học Sinh Mới</h2>
+        <div style="display: flex; gap: 20px">
+          <div style="flex: 1">
+            <div class="form-group">
+              <input type="text" id="studentName" placeholder="Họ và tên" />
+            </div>
+            <div class="form-group">
+              <input type="text" id="studentId" placeholder="Mã học sinh" />
+            </div>
+            <div class="form-group">
+              <input
+                type="date"
+                id="studentDob"
+                placeholder="Ngày sinh"
+              />
+            </div>
+
+            <div class="capture-section">
+              <h4>📸 Đăng ký khuôn mặt</h4>
+              <div
+                class="camera-container"
+                style="
+                  margin-top: 10px;
+                  background: #000;
+                  border-radius: 8px;
+                  overflow: hidden;
+                  position: relative;
+                "
+              >
+                <video
+                  id="video"
+                  autoplay
+                  playsinline
+                  style="width: 100%; display: none"
+                ></video>
+                <div
+                  id="cameraPlaceholder"
+                  style="padding: 40px; text-align: center; color: white"
+                >
+                  <p>Camera chưa bật</p>
+                </div>
+              </div>
+              <canvas id="canvas" style="display: none"></canvas>
+
+              <div
+                class="controls"
+                style="
+                  margin-top: 10px;
+                  display: flex;
+                  gap: 10px;
+                  flex-wrap: wrap;
+                "
+              >
+                <button
+                  type="button"
+                  id="startCameraBtn"
+                  class="action-btn"
+                  style="background: #3b82f6; color: white"
+                  onclick="startCamera()"
+                >
+                  Bật Camera
+                </button>
+                <button
+                  type="button"
+                  id="captureBtn"
+                  class="action-btn"
+                  style="background: #10b981; color: white; display: none"
+                  onclick="captureImage()"
+                >
+                  Chụp Ảnh
+                </button>
+                <button 
+                  type="button" 
+                  id="autoCaptureBtn" 
+                  class="action-btn" 
+                  style="background: #667eea; color: white; display: none" 
+                  onclick="toggleAutoCapture()"
+                >
+                  Chụp Tự Động
+                </button>
+                <button
+                  type="button"
+                  id="stopCameraBtn"
+                  class="action-btn"
+                  style="background: #ef4444; color: white; display: none"
+                  onclick="stopCamera()"
+                >
+                  Tắt Camera
+                </button>
+              </div>
+              
+              <div id="status" class="status"></div>
+
+              <div
+                class="capture-count"
+                style="margin-top: 10px; font-weight: bold; color: #667eea"
+              >
+                Đã chụp: <span id="captureCount">0</span> ảnh
+                <div class="recommendation" id="recommendation">
+                    <small>💡 Khuyến nghị: Chụp ít nhất <strong>5-10 ảnh</strong> với các góc độ khác nhau để đạt độ chính xác tốt nhất</small>
+                </div>
+              </div>
+
+              <div
+                id="previewContainer"
+                class="preview-images"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="modal-btn cancel-btn" onclick="closeModal()">
+            Hủy
+          </button>
+          <button class="modal-btn submit-btn" onclick="addStudent()">
+            Lưu & Đăng Ký
+          </button>
+        </div>
+        <div
+          id="uploadStatus"
+          style="margin-top: 10px; text-align: center; display: none"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      let currentClass = null;
+      let students = [];
+
+      // Camera variables
+      let stream = null;
+      let capturedImages = [];
+      let autoCaptureInterval = null;
+      let isAutoCapturing = false;
+
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+      const startCameraBtn = document.getElementById("startCameraBtn");
+      const captureBtn = document.getElementById("captureBtn");
+      const stopCameraBtn = document.getElementById("stopCameraBtn");
+      const autoCaptureBtn = document.getElementById("autoCaptureBtn");
+      const previewContainer = document.getElementById("previewContainer");
+      const captureCountSpan = document.getElementById("captureCount");
+      const statusDiv = document.getElementById("status");
+      const submitBtn = document.querySelector(".submit-btn");
+
+      function showStatus(message, type = 'info') {
+          statusDiv.className = `status ${type}`;
+          statusDiv.textContent = message;
+          statusDiv.style.display = 'block';
+      }
+
+      function hideStatus() {
+          statusDiv.style.display = 'none';
+      }
+
+      // 🟢 0. Xóa lớp
+      async function handleDeleteCurrentClass() {
+             if (!currentClass) return;
+             
+             // Get class name for confirmation
+             const className = document.getElementById("currentClass").textContent;
+             
+             if (!confirm(`Bạn có chắc muốn xóa lớp ${className}?\nTất cả dữ liệu học sinh trong lớp cũng sẽ bị ảnh hưởng.`)) {
+                 return;
+             }
+             
+             try {
+                const response = await fetch("/api/class/deleteClass", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ classId: currentClass })
+                });
+                const result = await response.json();
+                
+                if (!result.success) {
+                    alert(result.message);
+                    return;
+                }
+                
+                alert("Xóa thành công!");
+                window.location.reload(); // Reload to refresh list
+            } catch (error) {
+                console.error("Lỗi xóa lớp:", error);
+                alert("Đã xảy ra lỗi khi xóa lớp.");
+            }
+      }
+
+      // 🟢 1. Load danh sách lớp
+
+      async function loadClasses() {
+        try {
+          const response = await fetch("api/class/getClass", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            const classes = result.data;
+            const classSelectorDiv = document.getElementById("classSelector");
+
+            if (!classes || classes.length === 0) {
+              classSelectorDiv.textContent = "Không có lớp nào.";
+              return;
+            }
+
+            // Tạo nút cho từng lớp
+            classes.forEach((cls) => {
+              const div = document.createElement("div");
+              div.style.display = "inline-flex";
+              div.style.alignItems = "center";
+              div.style.marginRight = "10px";
+
+              const btn = document.createElement("button");
+              btn.textContent = cls.nameClass;
+              btn.classList.add("class-btn");
+              btn.onclick = (event) => selectClass(cls.id, event);
+
+              btn.onclick = (event) => selectClass(cls.id, event);
+
+              div.appendChild(btn);
+              classSelectorDiv.appendChild(div);
+            });
+
+            // Lấy classId từ URL
+            const params = new URLSearchParams(window.location.search);
+            const classIdFromURL = params.get("classId");
+
+            // Tìm nút tương ứng
+            let selectedClass = classes[0]; // mặc định lớp đầu tiên
+            if (classIdFromURL) {
+              const matched = classes.find((c) => c.id == classIdFromURL);
+              if (matched) selectedClass = matched;
+            }
+
+            const selectedBtn = Array.from(classSelectorDiv.children).find(
+              (btn) => btn.textContent === selectedClass.nameClass
+            );
+
+            // Gán active cho nút
+            selectedBtn.classList.add("active");
+            document.getElementById("currentClass").textContent =
+              selectedClass.nameClass;
+              
+            // Show delete button
+            document.getElementById("deleteClassBtn").style.display = "flex";
+
+            // Load danh sách học sinh lớp được chọn
+            await viewStudents(selectedClass.id);
+          }
+        } catch (error) {
+          console.error("Lỗi khi lấy thông tin lớp:", error);
+        }
+      }
+
+      // 🟢 2. Khi bấm chọn lớp
+      async function selectClass(classId, event) {
+        currentClass = classId;
+
+        // Cập nhật nút active
+        const buttons = document.querySelectorAll(".class-btn");
+        buttons.forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+
+        // Hiển thị tên lớp hiện tại
+        const selected = event.target.textContent;
+        document.getElementById("currentClass").textContent = selected;
+        
+        // Show delete button
+        document.getElementById("deleteClassBtn").style.display = "flex";
+        
+        await viewStudents(classId);
+      }
+
+      // 🟢 3. Lấy danh sách học sinh theo lớp từ API
+      async function viewStudents(classId) {
+        try {
+          const res = await fetch(
+            `/api/student/getStudents?classId=${classId}`
+          );
+          const data = await res.json();
+
+          students = data.data || []; // lưu lại để tìm kiếm
+          displayStudents(students);
+          filterStudents();
+        } catch (error) {
+          console.error("❌ Lỗi khi lấy danh sách học sinh:", error);
+        }
+      }
+
+      // 🟢 4. Lọc học sinh theo từ khóa
+      function filterStudents() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const filtered = students.filter(
+          (s) =>
+            s.student_name.toLowerCase().includes(searchTerm) ||
+            s.student_id.toLowerCase().includes(searchTerm)
+        );
+        displayStudents(filtered);
+      }
+
+      // 🟢 5. Hiển thị danh sách học sinh ra giao diện
+      function displayStudents(studentList) {
+        const container = document.getElementById("studentList");
+        document.getElementById("totalCount").textContent = studentList.length;
+
+        if (studentList.length === 0) {
+          container.innerHTML =
+            '<div class="no-results"><p>👤 Không tìm thấy học sinh nào</p></div>';
+          return;
+        }
+
+        container.innerHTML = studentList
+          .map(
+            (student) => `
+            <div class="student-card" style="cursor: pointer;" onclick="viewAbsences('${student.student_id}')">
+                <div class="student-info">
+                    <div class="avatar">${student.student_name.charAt(0)}</div>
+                    <div class="details">
+                        <div class="student-name" style="color: #3b82f6;">${student.student_name}</div>
+                        <div class="absent-center" style = "width: 100%;    text-align: center;    font-size: 16px;    font-weight: bold; margin: 10px 0;color: #e11d48;">📅 Ngày vắng: ${
+                          student.number_of_days_off
+                        }</div>
+
+                      
+                        <div class="info-grid">
+                            <div class="info-item">👤 Mã SV: ${
+                              student.student_id
+                            }</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="action-btn edit-btn" onclick="event.stopPropagation(); editStudent('${
+                      student.student_id
+                    }')">✏️</button>
+                    <button class="action-btn delete-btn" onclick="event.stopPropagation(); deleteStudent('${
+                      student.student_id
+                    }')">🗑️</button>
+                </div>
+            </div>
+        `
+          )
+          .join("");
+      }
+
+      async function viewAbsences(studentId) {
+          try {
+              // Pass currentClass if available to filter by class context
+              const url = `/api/student/absences?studentId=${studentId}${currentClass ? `&classId=${currentClass}` : ''}`;
+              const response = await fetch(url);
+              const result = await response.json();
+
+              if (result.success) {
+                  const absences = result.data;
+                  if (absences && absences.length > 0) {
+                      const dates = absences.map(a => {
+                          const date = new Date(a.absent_days);
+                          return date.toLocaleDateString('vi-VN');
+                      }).join('\n- ');
+                      alert(`Chi tiết ngày vắng của học sinh:\n- ${dates}`);
+                  } else {
+                      alert("🌟 Học sinh này rất ngoan! Không vắng buổi nào.");
+                  }
+              } else {
+                  alert("Lỗi: " + result.message);
+              }
+          } catch (error) {
+              console.error("Lỗi xem chi tiết vắng:", error);
+              alert("Đã xảy ra lỗi khi lấy thông tin.");
+          }
+      }
+
+      // 🟢 6. Modal và Camera Logic
+      function openModal() {
+        document.getElementById("addModal").classList.add("show");
+        resetForm();
+      }
+
+      function closeModal() {
+        document.getElementById("addModal").classList.remove("show");
+        stopCamera();
+        resetForm();
+      }
+
+      function resetForm() {
+        document.getElementById("studentName").value = "";
+        document.getElementById("studentId").value = "";
+        document.getElementById("studentDob").value = "";
+        capturedImages = [];
+        updatePreview();
+        updateCaptureCount();
+        hideStatus();
+        if(document.querySelector(".submit-btn")) document.querySelector(".submit-btn").disabled = false;
+      }
+
+      async function startCamera() {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+              facingMode: "user",
+            },
+          });
+          video.srcObject = stream;
+          video.style.display = "block";
+          cameraPlaceholder.style.display = "none";
+
+          startCameraBtn.style.display = "none";
+          captureBtn.style.display = "inline-block";
+          stopCameraBtn.style.display = "inline-block";
+          autoCaptureBtn.style.display = "inline-block";
+          showStatus('Camera đã bật. Bạn có thể chụp ảnh.', 'success');
+        } catch (error) {
+          alert("Không thể truy cập camera: " + error.message);
+        }
+      }
+
+      function stopCamera() {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+          stream = null;
+          video.srcObject = null;
+        }
+        
+        if (autoCaptureInterval) {
+            clearInterval(autoCaptureInterval);
+            autoCaptureInterval = null;
+            isAutoCapturing = false;
+            autoCaptureBtn.textContent = 'Chụp Tự Động';
+        }
+
+        video.style.display = "none";
+        cameraPlaceholder.style.display = "block";
+
+        startCameraBtn.style.display = "inline-block";
+        captureBtn.style.display = "none";
+        stopCameraBtn.style.display = "none";
+        autoCaptureBtn.style.display = "none";
+        hideStatus();
+      }
+
+      function captureImage() {
+        if (!stream) return;
+
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL("image/jpeg", 0.8);
+        capturedImages.push(imageData);
+        updatePreview();
+        updateCaptureCount();
+        showStatus(`Đã chụp ảnh ${capturedImages.length}`, 'success');
+      }
+
+      function toggleAutoCapture() {
+            if (isAutoCapturing) {
+                clearInterval(autoCaptureInterval);
+                autoCaptureInterval = null;
+                isAutoCapturing = false;
+                autoCaptureBtn.textContent = 'Chụp Tự Động';
+                showStatus('Đã dừng chụp tự động.', 'info');
+            } else {
+                isAutoCapturing = true;
+                autoCaptureBtn.textContent = 'Dừng Chụp';
+                captureImage(); // Chụp ngay
+                autoCaptureInterval = setInterval(() => {
+                    captureImage();
+                }, 2000); // Chụp mỗi 2 giây
+                showStatus('Đang chụp tự động mỗi 2 giây...', 'info');
+            }
+      }
+
+      function updatePreview() {
+        previewContainer.innerHTML = "";
+        capturedImages.forEach((img, index) => {
+          const div = document.createElement("div");
+          div.className = 'preview-image';
+          
+          const image = document.createElement("img");
+          image.src = img;
+          
+          const removeBtn = document.createElement("button");
+          removeBtn.className = 'remove';
+          removeBtn.innerHTML = "×";
+          removeBtn.onclick = () => {
+            capturedImages.splice(index, 1);
+            updatePreview();
+            updateCaptureCount();
+          };
+
+          div.appendChild(image);
+          div.appendChild(removeBtn);
+          previewContainer.appendChild(div);
+        });
+      }
+
+      function updateCaptureCount() {
+        const count = capturedImages.length;
+        captureCountSpan.textContent = count;
+        
+        // Update recommendation based on count
+        const recommendation = document.getElementById('recommendation');
+        if(recommendation) {
+            if (count === 0) {
+                recommendation.innerHTML = '<small>💡 Khuyến nghị: Chụp ít nhất <strong>5-10 ảnh</strong> với các góc độ khác nhau để đạt độ chính xác tốt nhất</small>';
+                recommendation.className = 'recommendation';
+            } else if (count < 3) {
+                recommendation.innerHTML = `<small>⚠️ Chưa đủ: Hiện có ${count} ảnh. Nên chụp thêm <strong>ít nhất 3-7 ảnh nữa</strong> với các góc độ khác nhau (chính diện, nghiêng trái, nghiêng phải, nhìn lên, nhìn xuống)</small>`;
+                recommendation.className = 'recommendation warning';
+            } else if (count < 5) {
+                recommendation.innerHTML = `<small>📸 Tốt: Đã có ${count} ảnh. Nên chụp thêm <strong>2-5 ảnh nữa</strong> để tăng độ chính xác. Thử các góc độ và điều kiện ánh sáng khác nhau</small>`;
+                recommendation.className = 'recommendation';
+            } else if (count < 10) {
+                recommendation.innerHTML = `<small>✅ Tốt: Đã có ${count} ảnh. Có thể chụp thêm <strong>vài ảnh nữa</strong> để đạt độ chính xác tối ưu</small>`;
+                recommendation.className = 'recommendation success';
+            } else {
+                recommendation.innerHTML = `<small>🎉 Xuất sắc: Đã có ${count} ảnh! Đủ để nhận diện với độ chính xác cao</small>`;
+                recommendation.className = 'recommendation success';
+            }
+        }
+      }
+
+      async function addStudent() {
+        const name = document.getElementById("studentName").value.trim();
+        const studentId = document.getElementById("studentId").value.trim();
+        const dob = document.getElementById("studentDob").value.trim();
+
+        if (!name || !studentId) {
+          alert("⚠️ Vui lòng nhập đầy đủ tên và mã học sinh!");
+          return;
+        }
+
+        if (capturedImages.length === 0) {
+          if (
+            !confirm(
+              "⚠️ Bạn chưa chụp ảnh khuôn mặt nào. Bạn có muốn tiếp tục mà không đăng ký khuôn mặt?"
+            )
+          ) {
+            return;
+          }
+        }
+
+        const submitBtn = document.querySelector(".submit-btn");
+        if(submitBtn) submitBtn.disabled = true;
+
+        // 1. Add Student Info
+        const newStudent = {
+          name,
+          studentId,
+          dob,
+          classId: currentClass,
+        };
+
+        try {
+          const res = await fetch("/api/student/addStudent", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newStudent),
+          });
+
+          const result = await res.json();
+
+          if (result.success) {
+            // If faces captured, register them
+            if (capturedImages.length > 0) {
+              await registerFaces(studentId, name);
+            } else {
+              alert("✅ Thêm học sinh thành công (Chưa có khuôn mặt)!");
+              closeModal();
+              await viewStudents(currentClass);
+            }
+          } else {
+            alert(result.message);
+            if(submitBtn) submitBtn.disabled = false;
+          }
+        } catch (err) {
+          console.error("❌ Lỗi khi thêm học sinh:", err);
+          alert("Có lỗi xảy ra khi thêm học sinh.");
+          if(submitBtn) submitBtn.disabled = false;
+        }
+      }
+
+      async function registerFaces(studentId, name) {
+        showStatus('Đang lưu ảnh khuôn mặt...', 'info');
+
+        let successCount = 0;
+        let failCount = 0;
+
+        for (let i = 0; i < capturedImages.length; i++) {
+          showStatus(`Đang lưu ảnh ${i + 1}/${capturedImages.length}...`, 'info');
+
+          try {
+            const response = await fetch(capturedImages[i]);
+            const blob = await response.blob();
+
+            const formData = new FormData();
+            formData.append("image", blob, `face_${i}.jpg`);
+            formData.append("studentId", studentId);
+            formData.append("studentName", name);
+
+            
+
+            const result = await uploadRes.json();
+            if (result.success) successCount++;
+            else failCount++;
+          } catch (err) {
+            console.error(err);
+            failCount++;
+          }
+        }
+
+        const msg = `✅ Thêm học sinh thành công!\n📸 Đã lưu ${successCount} ảnh.\n❌ Lỗi ${failCount} ảnh.`;
+        alert(msg);
+        closeModal();
+        await viewStudents(currentClass); // reload list
+      }
+
+      function editStudent(id) {
+        alert("🛠️ Chức năng chỉnh sửa đang được phát triển.");
+      }
+
+      async function deleteStudent(id) {
+        if (!confirm("Bạn có chắc muốn xóa học sinh này?\nHành động này không thể hoàn tác.")) {
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/student/deleteStudent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    studentId: id,
+                    classId: currentClass
+                })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                alert("✅ Xóa học sinh thành công!");
+                // Reload current list
+                if (currentClass) {
+                    await viewStudents(currentClass);
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                alert("❌ Lỗi: " + result.message);
+            }
+        } catch (error) {
+            console.error("Lỗi khi xóa học sinh:", error);
+            alert("Đã xảy ra lỗi khi kết nối tới server.");
+        }
+      }
+
+      window.onload = loadClasses;
+    </script>
+  </body>
+</html>

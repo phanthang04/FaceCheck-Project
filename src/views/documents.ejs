@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Tài Liệu Lớp Học</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+        .btn-secondary { background: #e9ecef; color: #495057; }
+        .btn-secondary:hover { background: #dee2e6; }
+        .btn-danger { background: #fee2e2; color: #dc2626; }
+        .btn-danger:hover { background: #fecaca; }
+
+        .upload-section {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-section:hover, .upload-section.dragover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+        .upload-icon { font-size: 40px; color: #a0aec0; margin-bottom: 10px; }
+
+        .doc-list {
+            list-style: none;
+            padding: 0;
+        }
+        .doc-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #edf2f7;
+            transition: background 0.2s;
+        }
+        .doc-item:hover { background: #f8fafc; }
+        .doc-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            background: #edf2f7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .doc-info { flex: 1; }
+        .doc-name { font-weight: 600; color: #2d3748; display: block; margin-bottom: 4px; text-decoration: none; }
+        .doc-meta { font-size: 13px; color: #718096; }
+        .doc-actions { display: flex; gap: 10px; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <a href="/" class="btn btn-secondary">⬅ Quay lại</a>
+                <h1 style="margin-top: 10px;">📂 Tài liệu lớp: <span id="className">Đang tải...</span></h1>
+            </div>
+            <button class="btn btn-primary" onclick="triggerUpload()">
+                ☁ Upload Tài Liệu
+            </button>
+            <input type="file" id="fileInput" hidden onchange="handleFileSelect(this)">
+        </div>
+
+        <div class="upload-section" id="dropZone">
+            <div class="upload-icon">⬇</div>
+            <h3>Kéo thả file vào đây hoặc click để upload</h3>
+            <p style="color: #718096; margin-top: 5px;">Hỗ trợ PDF, Word, Excel, PowerPoint, Ảnh</p>
+        </div>
+
+        <ul class="doc-list" id="docList"></ul>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const classId = urlParams.get('classId');
+
+        async function loadClassInfo() {
+            // Fetch class info to show name (optional, or pass name in query)
+            // For now just set ID or fetch if we had a single class API ready
+            // Let's assume we can get it or just show ID
+            // Ideally retrieve from an API.
+             try {
+                // Reusing getStudents API might be overhead just for name if we don't have getSingleClass.
+                // Let's fetch class list and find one. 
+                const res = await fetch('/api/class/getClass');
+                const data = await res.json();
+                if (data.success) {
+                    const cls = data.data.find(c => c.id == classId);
+                    if (cls) document.getElementById('className').textContent = cls.nameClass;
+                }
+            } catch (e) {}
+        }
+
+        async function loadDocuments() {
+            const list = document.getElementById('docList');
+            list.innerHTML = '<li class="empty-state">⏳ Đang tải...</li>';
+
+            try {
+                const res = await fetch(`/api/document/list?classId=${classId}`);
+                const result = await res.json();
+
+                if (result.success) {
+                    const docs = result.data;
+                    if (docs.length === 0) {
+                        list.innerHTML = '<li class="empty-state">Chưa có tài liệu nào.</li>';
+                        return;
+                    }
+                    
+                    list.innerHTML = docs.map(doc => {
+                        const icon = getIcon(doc.file_type);
+                        const date = new Date(doc.uploaded_at).toLocaleDateString('vi-VN');
+                        const downloadLink = `/${doc.file_path}`; // Files serving needs static config
+                        return `
+                            <li class="doc-item">
+                                <div class="doc-icon">${icon}</div>
+                                <div class="doc-info">
+                                    <a href="${downloadLink}" target="_blank" class="doc-name">${doc.file_name}</a>
+                                    <span class="doc-meta">${date} • ${doc.file_type.toUpperCase()}</span>
+                                </div>
+                                <div class="doc-actions">
+                                    <a href="${downloadLink}" target="_blank" class="btn btn-secondary">⬇ Tải</a>
+                                    <button class="btn btn-danger" onclick="deleteDocument(${doc.id})">🗑 Xóa</button>
+                                </div>
+                            </li>
+                        `;
+                    }).join('');
+                } else {
+                    list.innerHTML = `<li class="empty-state">❌ Lỗi: ${result.message}</li>`;
+                }
+            } catch (error) {
+                console.error(error);
+                list.innerHTML = '<li class="empty-state">❌ Lỗi kết nối</li>';
+            }
+        }
+
+        function getIcon(type) {
+            if (['pdf'].includes(type)) return '📕';
+            if (['doc', 'docx'].includes(type)) return '📘';
+            if (['xls', 'xlsx'].includes(type)) return '📗';
+            if (['ppt', 'pptx'].includes(type)) return '📙';
+            if (['jpg', 'jpeg', 'png'].includes(type)) return '🖼';
+            return '📄';
+        }
+
+        function triggerUpload() {
+            document.getElementById('fileInput').click();
+        }
+
+        async function handleFileSelect(input) {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('classId', classId);
+
+                // Show loading state
+                const originalText = document.querySelector('.btn-primary').innerHTML;
+                document.querySelector('.btn-primary').textContent = '⏳ Đang upload...';
+
+                try {
+                    const res = await fetch('/api/document/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await res.json();
+                    
+                    if (result.success) {
+                        loadDocuments();
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('Lỗi upload file');
+                } finally {
+                    document.querySelector('.btn-primary').innerHTML = originalText;
+                    input.value = ''; // Reset
+                }
+            }
+        }
+
+        async function deleteDocument(id) {
+            if (!confirm('Bạn chắc chắn muốn xóa tài liệu này?')) return;
+
+            try {
+                const res = await fetch('/api/document/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    loadDocuments();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Lỗi xóa file');
+            }
+        }
+
+        // Drag and Drop
+        const dropZone = document.getElementById('dropZone');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) { dropZone.classList.add('dragover'); }
+        function unhighlight(e) { dropZone.classList.remove('dragover'); }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('fileInput').files = files;
+            handleFileSelect(document.getElementById('fileInput'));
+        }
+
+        // Init
+        if (classId) {
+            loadClassInfo();
+            loadDocuments();
+        } else {
+            document.querySelector('.container').innerHTML = '<h2>⚠ Thiếu Class ID</h2><a href="/" class="btn btn-secondary">Về trang chủ</a>';
+        }
+    </script>
+</body>
+</html>
