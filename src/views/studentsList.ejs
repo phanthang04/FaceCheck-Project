@@ -765,9 +765,14 @@
                     <div class="avatar">${student.student_name.charAt(0)}</div>
                     <div class="details">
                         <div class="student-name" style="color: #3b82f6;">${student.student_name}</div>
-                        <div class="absent-center" style = "width: 100%;    text-align: center;    font-size: 16px;    font-weight: bold; margin: 10px 0;color: #e11d48;">📅 Ngày vắng: ${
-                          student.number_of_days_off
-                        }</div>
+                        
+                        <div class="absent-center" style = "width: 100%;    text-align: center;    font-size: 16px;    font-weight: bold; margin: 10px 0;color: #e11d48; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <span>📅 Ngày vắng: ${student.number_of_days_off}</span>
+                             ${student.hasFace 
+                                ? '<span style="background-color: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600;">✅ Đã xác minh</span>'
+                                : `<a href="/registerFace?studentId=${student.student_id}&studentName=${encodeURIComponent(student.student_name)}" style="text-decoration: none;"><span style="background-color: #ffedd5; color: #9a3412; padding: 4px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; cursor: pointer;">⚠️ Chưa đăng ký khuôn mặt</span></a>`
+                            }
+                        </div>
 
                       
                         <div class="info-grid">
@@ -1050,6 +1055,12 @@
             formData.append("studentName", name);
 
             
+
+            // Send to server
+            const uploadRes = await fetch("/api/students/registerFace", {
+                method: "POST",
+                body: formData
+            });
 
             const result = await uploadRes.json();
             if (result.success) successCount++;

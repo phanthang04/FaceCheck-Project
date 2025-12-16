@@ -112,9 +112,35 @@ export async function getStudents(req, res) {
             });
 
             if (student) {
+                // Check if student has registered face
+                const projectRoot = path.resolve(__dirname, '../../..');
+                const knownFacesDir = path.join(projectRoot, 'known_faces');
+                let hasFace = false;
+
+                if (fs.existsSync(knownFacesDir)) {
+                    // Search for folder starting with student_id
+                    const files = fs.readdirSync(knownFacesDir);
+                    // Mẫu tên folder: {student_id}_{student_name}
+                    // Cần match chính xác student_id ở đầu
+                    const studentFolder = files.find(f => {
+                         const parts = f.split('_');
+                         return parts[0] === String(student.student_id);
+                    });
+                     
+                    if (studentFolder) {
+                        const folderPath = path.join(knownFacesDir, studentFolder);
+                         // Check if folder is not empty
+                        if(fs.existsSync(folderPath)){
+                             const faceFiles = fs.readdirSync(folderPath);
+                             if(faceFiles.length > 0) hasFace = true;
+                        }
+                    }
+                }
+
                 studentsList.push({
                     ...student.dataValues,       // thông tin sinh viên
-                    number_of_days_off: sc.number_of_days_off ?? 0  // số ngày vắng
+                    number_of_days_off: sc.number_of_days_off ?? 0,  // số ngày vắng
+                    hasFace: hasFace
                 });
             }
         }
@@ -188,23 +214,33 @@ export async function checkFace(req, res) {
         
         // Gọi Python script với đường dẫn file
         // Trên Windows thử python trước, trên Unix thử python3
+        // Check for .venv python first
         const isWindows = process.platform === 'win32';
-        let pythonCommand = isWindows ? 'python' : 'python3';
-        
-        try {
-            await execAsync(`"${pythonCommand}" --version`, { timeout: 5000 });
-        } catch {
-            pythonCommand = isWindows ? 'python3' : 'python';
+        const venvPythonPath = isWindows 
+            ? path.join(projectRoot, '.venv', 'Scripts', 'python.exe')
+            : path.join(projectRoot, '.venv', 'bin', 'python');
+
+        let pythonCommand;
+
+        if (fs.existsSync(venvPythonPath)) {
+            pythonCommand = venvPythonPath;
+        } else {
+            pythonCommand = isWindows ? 'python' : 'python3';
             try {
                 await execAsync(`"${pythonCommand}" --version`, { timeout: 5000 });
-            } catch (error) {
-                // Xóa file tạm trước khi throw error
+            } catch {
+                pythonCommand = isWindows ? 'python3' : 'python';
                 try {
-                    if (fs.existsSync(tempImagePath)) {
-                        fs.unlinkSync(tempImagePath);
-                    }
-                } catch {}
-                throw new Error('Không tìm thấy Python. Vui lòng cài đặt Python và thêm vào PATH.');
+                    await execAsync(`"${pythonCommand}" --version`, { timeout: 5000 });
+                } catch (error) {
+                    // Cleanup temp file
+                    try {
+                        if (fs.existsSync(tempImagePath)) {
+                            fs.unlinkSync(tempImagePath);
+                        }
+                    } catch {}
+                    throw new Error('Không tìm thấy Python. Vui lòng cài đặt Python và thêm vào PATH.');
+                }
             }
         }
         
@@ -362,9 +398,9 @@ export async function registerFace(req, res) {
             fs.mkdirSync(studentFolderPath, { recursive: true });
         }
 
-        // Tạo tên file: {timestamp}.jpg
+        // Tạo tên file: {studentId}_{studentName}_{timestamp}.jpg
         const timestamp = Date.now();
-        const filename = `${timestamp}.jpg`;
+        const filename = `${sanitizedStudentId}_${sanitizedStudentName}_${timestamp}.jpg`;
         const destinationPath = path.join(studentFolderPath, filename);
 
         // Copy file từ temp sang known_faces
@@ -479,12 +515,23 @@ export async function doneCheck(req, res) {
 
         fs.writeFileSync(tempImagePath, Buffer.from(imageBase64, 'base64'));
 
+        // Check for .venv python first
         const isWindows = process.platform === 'win32';
-        let pythonCommand = isWindows ? 'python' : 'python3';
-        try {
-            await execAsync(`"${pythonCommand}" --version`, { timeout: 5000 });
-        } catch {
-            pythonCommand = isWindows ? 'python3' : 'python';
+        const venvPythonPath = isWindows 
+            ? path.join(projectRoot, '.venv', 'Scripts', 'python.exe')
+            : path.join(projectRoot, '.venv', 'bin', 'python');
+
+        let pythonCommand;
+
+        if (fs.existsSync(venvPythonPath)) {
+            pythonCommand = venvPythonPath;
+        } else {
+            pythonCommand = isWindows ? 'python' : 'python3';
+            try {
+                await execAsync(`"${pythonCommand}" --version`, { timeout: 5000 });
+            } catch {
+                pythonCommand = isWindows ? 'python3' : 'python';
+            }
         }
 
         let result;

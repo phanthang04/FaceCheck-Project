@@ -540,6 +540,24 @@
         window.addEventListener('beforeunload', () => {
             stopCamera();
         });
+        // Auto-fill from URL params
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const studentId = params.get('studentId');
+            const studentName = params.get('studentName');
+            
+            if (studentId) {
+                const idInput = document.getElementById('studentId');
+                idInput.value = studentId;
+                // idInput.readOnly = true; // Optional: lock ID if desired
+            }
+            
+            if (studentName) {
+                const nameInput = document.getElementById('studentName');
+                nameInput.value = studentName;
+                // nameInput.readOnly = true; // Optional: lock name if desired
+            }
+        });
     </script>
 </body>
 </html>
