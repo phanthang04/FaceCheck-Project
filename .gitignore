@@ -12,7 +12,7 @@ known_faces/*.jpg
 known_faces/*.jpeg
 known_faces/*.png
 !known_faces/.gitkeep
-
+known_faces/
 # Environment variables
 .env
 .env.local
