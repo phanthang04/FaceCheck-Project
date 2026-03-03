@@ -452,6 +452,8 @@
                 type="date"
                 id="studentDob"
                 placeholder="Ngày sinh"
+                min="1900-01-01"
+                max="2100-12-31"
               />
             </div>
 
@@ -659,8 +661,7 @@
               const btn = document.createElement("button");
               btn.textContent = cls.nameClass;
               btn.classList.add("class-btn");
-              btn.onclick = (event) => selectClass(cls.id, event);
-
+              btn.dataset.id = cls.id; // Add data-id for easy selection
               btn.onclick = (event) => selectClass(cls.id, event);
 
               div.appendChild(btn);
@@ -678,15 +679,17 @@
               if (matched) selectedClass = matched;
             }
 
-            const selectedBtn = Array.from(classSelectorDiv.children).find(
-              (btn) => btn.textContent === selectedClass.nameClass
-            );
+            // Find the button using data-id
+            const selectedBtn = classSelectorDiv.querySelector(`.class-btn[data-id="${selectedClass.id}"]`);
 
             // Gán active cho nút
-            selectedBtn.classList.add("active");
+            if (selectedBtn) selectedBtn.classList.add("active");
             document.getElementById("currentClass").textContent =
               selectedClass.nameClass;
-              
+            
+            // Set currentClass variables
+            currentClass = selectedClass.id;
+
             // Show delete button
             document.getElementById("deleteClassBtn").style.display = "flex";
 

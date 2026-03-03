@@ -8,7 +8,7 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import {getStudents, addStudent, checkFace, registerFace, markAttendance, doneCheck, getAttended, deleteStudent, finishAttendance, getStudentAbsences} from "../students/studentController.js";
+import {getStudents, addStudent, registerFace, doneCheck, deleteStudent, finishAttendance, getStudentAbsences} from "../students/studentController.js";
 
 // Cấu hình multer để lưu file tạm
 const storage = multer.diskStorage({
@@ -43,11 +43,11 @@ const upload = multer({
 
 router.post("/student/addStudent", addStudent);
 router.get("/student/getStudents", getStudents);
-router.post("/students/check", upload.single('image'), checkFace);
+
 router.post("/students/registerFace", upload.single('image'), registerFace);
-router.post("/students/markAttendance", markAttendance);
+
 router.post("/students/done", upload.single('image'), doneCheck);
-router.post("/attended", getAttended);
+
 router.post("/student/deleteStudent", deleteStudent);
 router.post("/student/finishAttendance", finishAttendance);
 router.get("/student/absences", getStudentAbsences);

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Đồ Án FaceCheck</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active">
+            <h1>FaceCheck</h1>
+            <h3>Hệ Thống Điểm Danh Thông Minh AI</h3>
+            <p>Giải pháp quản lý lớp học bằng nhận diện khuôn mặt</p>
+        </div>
+
+        <!-- Slide 2: Introduction -->
+        <div class="slide">
+            <div class="slide-content">
+                <h2>Giới Thiệu</h2>
+                <p><strong>FaceCheck</strong> là hệ thống điểm danh tự động thông minh giúp tối ưu hóa quy trình quản lý học sinh/sinh viên.</p>
+                <p>Sử dụng công nghệ <strong>Thị giác máy tính (Computer Vision)</strong> và AI để loại bỏ việc điểm danh thủ công, đảm bảo tính chính xác và tiết kiệm thời gian.</p>
+            </div>
+            <div class="slide-number">01</div>
+        </div>
+
+        <!-- Slide 3: Problem & Solution -->
+        <div class="slide">
+            <h2>Thách Thức & Giải Pháp</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>Vấn Đề Thực Tế</h4>
+                    <ul>
+                        <li>Điểm danh thủ công tốn nhiều thời gian.</li>
+                        <li>Tình trạng điểm danh hộ, gian lận.</li>
+                        <li>Khó khăn trong tổng hợp báo cáo giấy tờ.</li>
+                    </ul>
+                </div>
+                <div class="tech-item">
+                    <h4>Giải Pháp FaceCheck</h4>
+                    <ul>
+                        <li>Nhận diện <span class="highlight">thời gian thực</span> tức thì.</li>
+                        <li>Lưu trữ dữ liệu tập trung, bảo mật.</li>
+                        <li>Báo cáo thống kê tự động hóa.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-number">02</div>
+        </div>
+
+        <!-- Slide 4: Key Features -->
+        <div class="slide">
+            <h2>Tính Năng Chính</h2>
+            <ul>
+                <li><strong>Nhận diện khuôn mặt</strong>: Sử dụng YOLOv8 & Deep Learning để phát hiện và định danh chính xác.</li>
+                <li><strong>Quản lý lớp học</strong>: Thêm, sửa, xóa sinh viên và theo dõi lịch sử điểm danh.</li>
+                <li><strong>Báo cáo trực quan</strong>: Dashboard giúp giáo viên dễ dàng quan sát sĩ số và tình trạng vắng.</li>
+                <li><strong>Đăng ký khuôn mặt</strong>: Quy trình thu thập dữ liệu khuôn mặt đơn giản, nhanh chóng.</li>
+            </ul>
+            <div class="slide-number">03</div>
+        </div>
+
+        <!-- Slide 5: Tech Stack -->
+        <div class="slide">
+            <h2>Công Nghệ Sử Dụng</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>Backend & Core</h4>
+                    <p>Node.js, Express.js</p>
+                    <p>Python (AI Service)</p>
+                </div>
+                <div class="tech-item">
+                    <h4>AI & Machine Learning</h4>
+                    <p>YOLOv8 (Detection)</p>
+                    <p>face_recognition / DeepFace</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Cơ Sở Dữ Liệu</h4>
+                    <p>MySQL / SQLite</p>
+                    <p>Sequelize ORM</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Frontend</h4>
+                    <p>EJS Templating</p>
+                    <p>HTML5, CSS3, JavaScript</p>
+                </div>
+            </div>
+            <div class="slide-number">04</div>
+        </div>
+
+        <!-- Slide 6: System Architecture -->
+        <div class="slide">
+            <h2>Luồng Hoạt Động</h2>
+            <div style="background: rgba(0,0,0,0.3); padding: 2rem; border-radius: 12px; margin-top: 1rem; text-align: center;">
+                <p style="font-family: monospace; color: #38bdf8; font-size: 1.1rem; line-height: 2;">
+                    [ Camera / Webcam ] <br>
+                         ↓ <br>
+                    [ Xử Lý Ảnh (Python AI Service) ] → [ Nhận Diện Khuôn Mặt ] <br>
+                         ↓ <br>
+                    [ Server Node.js ] ← [ Cơ Sở Dữ Liệu ] <br>
+                         ↓ <br>
+                    [ Giao Diện Web (Giáo Viên/Admin) ]
+                </p>
+            </div>
+            <div class="slide-number">05</div>
+        </div>
+
+        <!-- Slide 7: Project Demo Images -->
+        <div class="slide">
+            <h2>Hình Ảnh Thực Tế</h2>
+            <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; width: 100%; height: 60%;">
+                <div style="flex: 1; text-align: center;">
+                    <img src="images/login.png" alt="Login Page" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">Đăng Nhập</p>
+                </div>
+                <div style="flex: 1; text-align: center;">
+                    <img src="images/dashboard.png" alt="Dashboard" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">Quản Lý Lớp Học</p>
+                </div>
+                <div style="flex: 1; text-align: center;">
+                    <img src="images/register.png" alt="Register Face" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #94a3b8;">Đăng Ký Khuôn Mặt</p>
+                </div>
+            </div>
+            <div class="slide-number">06</div>
+        </div>
+
+        <!-- Slide 8: Future & Conclusion -->
+        <div class="slide center-content">
+            <h2>Hướng Phát Triển</h2>
+            <ul style="justify-content: center; width: 100%;">
+                <li>Phát triển ứng dụng di động cho sinh viên.</li>
+                <li>Tích hợp phân tích dữ liệu chuyên sâu (Tuần/Tháng).</li>
+                <li>Hỗ trợ nhiều camera cho giảng đường lớn.</li>
+            </ul>
+            <br><br>
+            <h3 style="color: var(--accent-color);">Cảm Ơn Thầy Cô Và Các Bạn Đã Lắng Nghe!</h3>
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn">Trước</button>
+        <button id="nextBtn">Sau</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

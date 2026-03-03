@@ -500,13 +500,9 @@
                 if (successCount > 0) {
                     showStatus(`Đã lưu thành công ${successCount}/${capturedImages.length} ảnh!`, 'success');
                     setTimeout(() => {
-                        capturedImages = [];
-                        updatePreview();
-                        updateCaptureCount();
-                        document.getElementById('studentId').value = '';
-                        document.getElementById('studentName').value = '';
-                        hideStatus();
-                    }, 2000);
+                         alert('Đã lưu thành công!');
+                         window.location.href = '/studentsList';
+                    }, 500);
                 } else {
                     showStatus('Không thể lưu ảnh. Vui lòng thử lại!', 'error');
                 }
